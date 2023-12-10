@@ -118,20 +118,19 @@ extension ImagePickerController {
           relatedBy: .equal, toItem: view, attribute: attribute,
           multiplier: 1, constant: 0))
       }
-      let bottomHeightPadding: CGFloat
-      if #available(iOS 11.0, *) {
+      var bottomHeightPadding: CGFloat = 0
+     
         view.addConstraint(NSLayoutConstraint(item: galleryView, attribute: .top,
                                               relatedBy: .equal, toItem: view.safeAreaLayoutGuide,
                                               attribute: .top,
                                               multiplier: 1, constant: 0))
-        bottomHeightPadding = UIApplication.shared.keyWindow!.safeAreaInsets.bottom
-      } else {
-        view.addConstraint(NSLayoutConstraint(item: galleryView, attribute: .top,
-                                              relatedBy: .equal, toItem: view,
-                                              attribute: .top,
-                                              multiplier: 1, constant: 0))
-        bottomHeightPadding = 0
-      }
+          if let windowScene = UIApplication.shared.connectedScenes
+              .compactMap({ $0 as? UIWindowScene })
+              .first(where: { $0.activationState == .foregroundActive }),
+              let window = windowScene.windows.first(where: { $0.isKeyWindow }) {
+              bottomHeightPadding = window.safeAreaInsets.bottom
+          }
+      
       view.addConstraint(NSLayoutConstraint(item: galleryView, attribute: .height,
         relatedBy: .equal, toItem: view, attribute: .height,
         multiplier: 1, constant: -(BottomContainerView.Dimensions.height + bottomHeightPadding)))
@@ -150,17 +149,10 @@ extension ImagePickerController {
           multiplier: 1, constant: 0))
       }
       
-      if #available(iOS 11.0, *) {
         view.addConstraint(NSLayoutConstraint(item: topView, attribute: .top,
                                               relatedBy: .equal, toItem: view.safeAreaLayoutGuide,
                                               attribute: .top,
                                               multiplier: 1, constant: 0))
-      } else {
-        view.addConstraint(NSLayoutConstraint(item: topView, attribute: .top,
-                                              relatedBy: .equal, toItem: view,
-                                              attribute: .top,
-                                              multiplier: 1, constant: 0))
-      }
       
       view.addConstraint(NSLayoutConstraint(item: topView, attribute: .height,
         relatedBy: .equal, toItem: nil, attribute: .notAnAttribute,
@@ -170,21 +162,20 @@ extension ImagePickerController {
         relatedBy: .equal, toItem: view, attribute: .height,
         multiplier: 1, constant: -BottomContainerView.Dimensions.height))
     }
-    
-    if #available(iOS 11.0, *) {
-      let heightPadding = UIApplication.shared.keyWindow!.safeAreaInsets.bottom
+      var heightPadding:CGFloat = 0
+      if let windowScene = UIApplication.shared.connectedScenes
+          .compactMap({ $0 as? UIWindowScene })
+          .first(where: { $0.activationState == .foregroundActive }),
+          let window = windowScene.windows.first(where: { $0.isKeyWindow }) {
+          heightPadding = window.safeAreaInsets.bottom
+      }
+
       view.addConstraint(NSLayoutConstraint(item: bottomContainer, attribute: .height,
                                             relatedBy: .equal, toItem: nil,
                                             attribute: .notAnAttribute,
                                             multiplier: 1,
                                             constant: BottomContainerView.Dimensions.height + heightPadding))
-    } else {
-      view.addConstraint(NSLayoutConstraint(item: bottomContainer, attribute: .height,
-                                            relatedBy: .equal, toItem: nil,
-                                            attribute: .notAnAttribute,
-                                            multiplier: 1,
-                                            constant: BottomContainerView.Dimensions.height))
-    }
+    
   }
 }
 

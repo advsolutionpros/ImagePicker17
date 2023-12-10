@@ -136,17 +136,22 @@ open class ImagePickerController: UIViewController {
     setupConstraints()
   }
 
-  open override func viewWillAppear(_ animated: Bool) {
-    super.viewWillAppear(animated)
+    open override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
 
-    if configuration.managesAudioSession {
-      _ = try? AVAudioSession.sharedInstance().setActive(true)
+        if configuration.managesAudioSession {
+            _ = try? AVAudioSession.sharedInstance().setActive(true)
+        }
+
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            let statusBarManager = windowScene.statusBarManager
+            //statusBarManager?.statusBarStyle = .default
+            //statusBarManager.statusBar?.isHidden = false // Adjust the visibility as needed
+        }
+
+        self.handleRotation(nil)
     }
 
-    statusBarHidden = UIApplication.shared.isStatusBarHidden
-
-    self.handleRotation(nil)
-  }
 
   open override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
@@ -195,24 +200,25 @@ open class ImagePickerController: UIViewController {
     }
   }
 
-  func presentAskPermissionAlert() {
-    let alertController = UIAlertController(title: configuration.requestPermissionTitle, message: configuration.requestPermissionMessage, preferredStyle: .alert)
+    func presentAskPermissionAlert() {
+        let alertController = UIAlertController(title: configuration.requestPermissionTitle, message: configuration.requestPermissionMessage, preferredStyle: .alert)
 
-    let alertAction = UIAlertAction(title: configuration.OKButtonTitle, style: .default) { _ in
-      if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
-        UIApplication.shared.openURL(settingsURL)
-      }
+        let alertAction = UIAlertAction(title: configuration.OKButtonTitle, style: .default) { _ in
+            if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
+            }
+        }
+
+        let cancelAction = UIAlertAction(title: configuration.cancelButtonTitle, style: .cancel) { _ in
+            self.dismiss(animated: true, completion: nil)
+        }
+
+        alertController.addAction(alertAction)
+        alertController.addAction(cancelAction)
+
+        present(alertController, animated: true, completion: nil)
     }
 
-    let cancelAction = UIAlertAction(title: configuration.cancelButtonTitle, style: .cancel) { _ in
-      self.dismiss(animated: true, completion: nil)
-    }
-
-    alertController.addAction(alertAction)
-    alertController.addAction(cancelAction)
-
-    present(alertController, animated: true, completion: nil)
-  }
 
   func hideViews() {
     enableGestures(false)

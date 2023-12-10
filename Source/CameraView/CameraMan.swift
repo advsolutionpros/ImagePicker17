@@ -2,7 +2,7 @@ import Foundation
 import AVFoundation
 import PhotosUI
 
-protocol CameraManDelegate: class {
+protocol CameraManDelegate: AnyObject {
   func cameraManNotAvailable(_ cameraMan: CameraMan)
   func cameraManDidStart(_ cameraMan: CameraMan)
   func cameraMan(_ cameraMan: CameraMan, didChangeInput input: AVCaptureDeviceInput)
@@ -30,27 +30,29 @@ class CameraMan {
     checkPermission()
   }
 
-  func setupDevices() {
-    // Input
-    AVCaptureDevice
-    .devices()
-    .filter {
-      return $0.hasMediaType(AVMediaType.video)
-    }.forEach {
-      switch $0.position {
-      case .front:
-        self.frontCamera = try? AVCaptureDeviceInput(device: $0)
-      case .back:
-        self.backCamera = try? AVCaptureDeviceInput(device: $0)
-      default:
-        break
-      }
+    func setupDevices() {
+        // Input
+        let discoverySession = AVCaptureDevice.DiscoverySession(
+            deviceTypes: [.builtInWideAngleCamera],
+            mediaType: .video,
+            position: .unspecified
+        )
+
+        let devices = discoverySession.devices
+
+        for device in devices {
+            switch device.position {
+            case .front:
+                self.frontCamera = try? AVCaptureDeviceInput(device: device)
+            case .back:
+                self.backCamera = try? AVCaptureDeviceInput(device: device)
+            default:
+                break
+            }
+        }
     }
 
-    // Output
-    stillImageOutput = AVCaptureStillImageOutput()
-    stillImageOutput?.outputSettings = [AVVideoCodecKey: AVVideoCodecJPEG]
-  }
+
 
   func addInput(_ input: AVCaptureDeviceInput) {
     configurePreset(input)

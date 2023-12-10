@@ -2,7 +2,7 @@ import UIKit
 import AVFoundation
 import PhotosUI
 
-protocol CameraViewDelegate: class {
+protocol CameraViewDelegate: AnyObject {
 
   func setFlashButtonHidden(_ hidden: Bool)
   func imageToLibrary()
@@ -55,24 +55,24 @@ class CameraView: UIViewController, CLLocationManagerDelegate, CameraManDelegate
     return label
     }()
 
-  lazy var noCameraButton: UIButton = { [unowned self] in
-    let button = UIButton(type: .system)
-    let title = NSAttributedString(string: self.configuration.settingsTitle,
-      attributes: [
-        NSAttributedString.Key.font: self.configuration.settingsFont,
-        NSAttributedString.Key.foregroundColor: self.configuration.settingsColor
-      ])
+    lazy var noCameraButton: UIButton = { [unowned self] in
+        var buttonConfig = UIButton.Configuration.tinted()
+        buttonConfig.title = self.configuration.settingsTitle
+        buttonConfig.baseForegroundColor = self.configuration.settingsColor
+        buttonConfig.titlePadding = 10.0
+        buttonConfig.image = nil
+        buttonConfig.cornerStyle = .small
+        buttonConfig.imagePadding = 5.0
 
-    button.setAttributedTitle(title, for: UIControl.State())
-    button.contentEdgeInsets = UIEdgeInsets(top: 5.0, left: 10.0, bottom: 5.0, right: 10.0)
-    button.sizeToFit()
-    button.layer.borderColor = self.configuration.settingsColor.cgColor
-    button.layer.borderWidth = 1
-    button.layer.cornerRadius = 4
-    button.addTarget(self, action: #selector(settingsButtonDidTap), for: .touchUpInside)
+        let button = UIButton(configuration: buttonConfig)
+        button.sizeToFit()
+        button.layer.borderWidth = 1
+        button.layer.borderColor = self.configuration.settingsColor.cgColor
+        button.addTarget(self, action: #selector(settingsButtonDidTap), for: .touchUpInside)
 
-    return button
+        return button
     }()
+
 
   lazy var tapGestureRecognizer: UITapGestureRecognizer = { [unowned self] in
     let gesture = UITapGestureRecognizer()
@@ -185,13 +185,14 @@ class CameraView: UIViewController, CLLocationManagerDelegate, CameraManDelegate
 
   // MARK: - Actions
 
-  @objc func settingsButtonDidTap() {
-    DispatchQueue.main.async {
-      if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
-        UIApplication.shared.openURL(settingsURL)
-      }
+    @objc func settingsButtonDidTap() {
+        DispatchQueue.main.async {
+            if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
+            }
+        }
     }
-  }
+
 
   // MARK: - Camera actions
 

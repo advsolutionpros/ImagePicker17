@@ -1,6 +1,6 @@
 import UIKit
 
-protocol TopViewDelegate: class {
+protocol TopViewDelegate: AnyObject {
 
   func flashButtonDidPress(_ title: String)
   func rotateDeviceDidPress()
@@ -19,21 +19,29 @@ open class TopView: UIView {
   var currentFlashIndex = 0
   let flashButtonTitles = ["AUTO", "ON", "OFF"]
 
-  open lazy var flashButton: UIButton = { [unowned self] in
-    let button = UIButton()
-    button.setImage(AssetManager.getImage("AUTO"), for: UIControl.State())
-    button.setTitle("AUTO", for: UIControl.State())
-    button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 4, bottom: 0, right: 0)
-    button.setTitleColor(UIColor.white, for: UIControl.State())
-    button.setTitleColor(UIColor.white, for: .highlighted)
-    button.titleLabel?.font = self.configuration.flashButton
-    button.addTarget(self, action: #selector(flashButtonDidPress(_:)), for: .touchUpInside)
-    button.contentHorizontalAlignment = .left
-    button.accessibilityLabel = "Flash mode is auto"
-    button.accessibilityHint = "Double-tap to change flash mode"
+    open lazy var flashButton: UIButton = { [unowned self] in
+        var config = UIButton.Configuration.plain()
+        config.image = AssetManager.getImage("AUTO")
+        config.title = "AUTO"
+        config.imagePadding = 4
+        config.baseForegroundColor = UIColor.white
+        config.baseBackgroundColor = UIColor.clear
+        //config.titleHighlightedColor = UIColor.white // Set the highlighted text color here
+        //config.titleFont = self.configuration.flashButton
 
-    return button
+        let button = UIButton(configuration: config)
+        button.addAction(UIAction(handler: { [weak self] _ in
+            self?.flashButtonDidPress(button)
+        }), for: .touchUpInside)
+        
+        button.contentHorizontalAlignment = .left
+        button.accessibilityLabel = "Flash mode is auto"
+        button.accessibilityHint = "Double-tap to change flash mode"
+
+        return button
     }()
+
+
 
   open lazy var rotateCamera: UIButton = { [unowned self] in
     let button = UIButton()
