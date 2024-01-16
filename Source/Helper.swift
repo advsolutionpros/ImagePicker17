@@ -18,22 +18,22 @@ struct Helper {
     }
   }
 
-  static func getVideoOrientation(fromDeviceOrientation orientation: UIDeviceOrientation) -> AVCaptureVideoOrientation {
-    switch orientation {
-    case .landscapeLeft:
-      return .landscapeRight
-    case .landscapeRight:
-      return .landscapeLeft
-    case .portraitUpsideDown:
-      return .portraitUpsideDown
-    default:
-      return .portrait
-    }
-  }
-
-  static func videoOrientation() -> AVCaptureVideoOrientation {
-    return getVideoOrientation(fromDeviceOrientation: previousOrientation)
-  }
+//  static func getVideoOrientation(fromDeviceOrientation orientation: UIDeviceOrientation) -> AVCaptureVideoOrientation {
+//    switch orientation {
+//    case .landscapeLeft:
+//      return .landscapeRight
+//    case .landscapeRight:
+//      return .landscapeLeft
+//    case .portraitUpsideDown:
+//      return .portraitUpsideDown
+//    default:
+//      return .portrait
+//    }
+//  }
+//
+//  static func videoOrientation() -> AVCaptureVideoOrientation {
+//    return getVideoOrientation(fromDeviceOrientation: previousOrientation)
+//  }
 
   static func screenSizeForOrientation() -> CGSize {
     switch UIDevice.current.orientation {
