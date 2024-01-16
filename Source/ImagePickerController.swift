@@ -75,6 +75,7 @@ open class ImagePickerController: UIViewController {
   open var preferredImageSize: CGSize?
   open var startOnFrontCamera = false
   var totalSize: CGSize { return UIScreen.main.bounds.size }
+    
   var initialFrame: CGRect?
   var initialContentOffset: CGPoint?
   var numberOfCells: Int?
@@ -143,15 +144,10 @@ open class ImagePickerController: UIViewController {
             _ = try? AVAudioSession.sharedInstance().setActive(true)
         }
 
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
-            let statusBarManager = windowScene.statusBarManager
-            //statusBarManager?.statusBarStyle = .default
-            //statusBarManager.statusBar?.isHidden = false // Adjust the visibility as needed
-        }
+        statusBarHidden = UIApplication.shared.isStatusBarHidden
 
         self.handleRotation(nil)
     }
-
 
   open override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
@@ -218,7 +214,6 @@ open class ImagePickerController: UIViewController {
 
         present(alertController, animated: true, completion: nil)
     }
-
 
   func hideViews() {
     enableGestures(false)
