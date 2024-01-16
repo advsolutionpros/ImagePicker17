@@ -167,11 +167,31 @@ class CameraMan {
                     return
                 }
                 
+                let existingImages = [UIImage]()
+                var updatedImages = existingImages
+                
+                self.savePhotos(existingImages, newImage: image, location: nil) { updatedImages in
+                    // Handle the updated array of images
+                    print(updatedImages)
+                }
+                
                 self.savePhoto(image, location: location, completion: completion)
             }
         }
     }
     
+    func savePhotos(_ imagesArray: [UIImage], newImage: UIImage, location: CLLocation?, completion: @escaping ([UIImage]) -> Void) {
+        // Process the images or perform any other necessary operations
+        // For demonstration purposes, let's assume you just want to append the new image
+        var updatedImages = imagesArray
+
+        // Append the new image to the array
+        updatedImages.append(newImage)
+
+        // Call the completion handler with the updated array
+        completion(updatedImages)
+    }
+
     func savePhoto(_ image: UIImage, location: CLLocation?, completion: (() -> Void)? = nil) {
         PHPhotoLibrary.shared().performChanges({
             let request = PHAssetChangeRequest.creationRequestForAsset(from: image)
