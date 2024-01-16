@@ -136,6 +136,7 @@ open class ImagePickerController: UIViewController {
 
     subscribe()
     setupConstraints()
+      collapseGalleryView(nil)
   }
 
     open override func viewWillAppear(_ animated: Bool) {
