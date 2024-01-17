@@ -141,7 +141,7 @@ open class ImagePickerController: UIViewController {
 
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
+        print("\(Date()) \("💙") \(self).\(#function):\(#line)-ImagePickerController viewWillAppear")
         if configuration.managesAudioSession {
             _ = try? AVAudioSession.sharedInstance().setActive(true)
         }
@@ -153,7 +153,7 @@ open class ImagePickerController: UIViewController {
 
   open override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
-
+      print("\(Date()) \("💙") \(self).\(#function):\(#line)-ImagePickerController viewDidAppear")
     let galleryHeight: CGFloat = UIScreen.main.nativeBounds.height == 960
       ? ImageGalleryView.Dimensions.galleryBarHeight : GestureConstants.minimumHeight
 
@@ -357,6 +357,7 @@ open class ImagePickerController: UIViewController {
     }
 
   fileprivate func takePicture() {
+      print("\(Date()) \("💙") \(self).\(#function):\(#line)-ImagePickerController takePictures")
     guard isBelowImageLimit() && !isTakingPicture else { return }
     isTakingPicture = true
     bottomContainer.pickerButton.isEnabled = false

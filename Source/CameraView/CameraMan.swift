@@ -31,6 +31,7 @@ class CameraMan {
     func setup(_ startOnFrontCamera: Bool = false) {
         self.startOnFrontCamera = startOnFrontCamera
         checkPermission()
+        print("\(Date()) \("💙") \(self).\(#function):\(#line)-CameraMan setup")
     }
     
     func setupDevices() {
@@ -103,7 +104,7 @@ class CameraMan {
     fileprivate func start() {
         // Devices
         setupDevices()
-        
+        print("\(Date()) \("💙") \(self).\(#function):\(#line)-CameraMan start")
         guard let input = (self.startOnFrontCamera) ? frontCamera ?? backCamera : backCamera, let output = stillImageOutput else { return }
         
         addInput(input)
