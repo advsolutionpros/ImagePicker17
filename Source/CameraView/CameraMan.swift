@@ -20,6 +20,8 @@ class CameraMan {
     var startOnFrontCamera: Bool = false
     let existingImages = [UIImage]()
     var updatedImages = [UIImage]()
+    // Define an array to hold the captured images
+    var capturedImages: [UIImage] = []
     
     private let captureOrientation = CaptureOrientation()
     deinit {
@@ -169,13 +171,14 @@ class CameraMan {
                     }
                     return
                 }
-                
+                // Add the captured image to the array
+                self.capturedImages.append(image)
                 self.savePhotos(self.existingImages, newImage: image, location: nil) { updatedImages in
                     // Handle the updated array of images
                     print(updatedImages)
                 }
                 
-                self.savePhoto(image, location: location, completion: completion)
+               // self.savePhoto(image, location: location, completion: completion)
             }
         }
     }
