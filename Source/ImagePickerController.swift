@@ -117,24 +117,16 @@ open class ImagePickerController: UIViewController {
       self.view.addSubview(subview)
       subview.translatesAutoresizingMaskIntoConstraints = false
     }
+    
+    if !configuration.galleryOnly {
       addSubview(cameraController.view)
-          addSubview(topView)
-
-          if !configuration.cameraOnly {
-              addSubview(galleryView)
-              addSubview(bottomContainer)
-              cameraController.view.addGestureRecognizer(panGestureRecognizer)
-          }
-//    if !configuration.galleryOnly {
-//      addSubview(cameraController.view)
-//      addSubview(topView)
-//      cameraController.view.addGestureRecognizer(panGestureRecognizer)
-//    }
-//    
-//    for subview in [galleryView, bottomContainer] {
-//        print(subview.description)
-//        addSubview(bottomContainer)
-//    }
+      addSubview(topView)
+      cameraController.view.addGestureRecognizer(panGestureRecognizer)
+    }
+    
+    for subview in [galleryView, bottomContainer] {
+      addSubview(subview)
+    }
 
     view.addSubview(volumeView)
     view.sendSubviewToBack(volumeView)
@@ -144,10 +136,7 @@ open class ImagePickerController: UIViewController {
 
     subscribe()
     setupConstraints()
-      if configuration.cameraOnly {
-              galleryView.isHidden = true // Hide gallery in camera-only mode
-          }
-     // collapseGalleryView(nil)
+      collapseGalleryView(nil)
   }
 
     open override func viewWillAppear(_ animated: Bool) {

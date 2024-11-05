@@ -21,7 +21,7 @@ open class BottomContainerView: UIView {
     pickerButton.setTitleColor(UIColor.white, for: UIControl.State())
     pickerButton.delegate = self
     pickerButton.numberLabel.isHidden = !self.configuration.showsImageCountLabel
-      pickerButton.translatesAutoresizingMaskIntoConstraints = false
+
     return pickerButton
     }()
 
@@ -31,7 +31,7 @@ open class BottomContainerView: UIView {
     view.layer.borderColor = UIColor.white.cgColor
     view.layer.borderWidth = ButtonPicker.Dimensions.borderWidth
     view.layer.cornerRadius = ButtonPicker.Dimensions.buttonBorderSize / 2
-      view.translatesAutoresizingMaskIntoConstraints = false
+
     return view
     }()
 
@@ -40,7 +40,7 @@ open class BottomContainerView: UIView {
     button.setTitle(self.configuration.cancelButtonTitle, for: UIControl.State())
     button.titleLabel?.font = self.configuration.doneButton
     button.addTarget(self, action: #selector(doneButtonDidPress(_:)), for: .touchUpInside)
-      button.translatesAutoresizingMaskIntoConstraints = false
+
     return button
     }()
 
@@ -49,8 +49,8 @@ open class BottomContainerView: UIView {
   lazy var topSeparator: UIView = { [unowned self] in
     let view = UIView()
     view.backgroundColor = self.configuration.backgroundColor
-      view.translatesAutoresizingMaskIntoConstraints = false
-      return view
+
+    return view
     }()
 
   lazy var tapGestureRecognizer: UITapGestureRecognizer = { [unowned self] in
@@ -80,7 +80,7 @@ open class BottomContainerView: UIView {
   func configure() {
     [borderPickerButton, pickerButton, doneButton, stackView, topSeparator].forEach {
       addSubview($0)
-      //$0.translatesAutoresizingMaskIntoConstraints = false
+      $0.translatesAutoresizingMaskIntoConstraints = false
     }
 
     backgroundColor = configuration.backgroundColor
@@ -88,13 +88,10 @@ open class BottomContainerView: UIView {
     stackView.addGestureRecognizer(tapGestureRecognizer)
 
     setupConstraints()
-      if configuration.cameraOnly {
-                  stackView.isHidden = true
-                  borderPickerButton.isHidden = true
-              } else if configuration.galleryOnly {
-                  borderPickerButton.isHidden = true
-                  pickerButton.isHidden = true
-              }
+    if configuration.galleryOnly {
+      borderPickerButton.isHidden = true
+      pickerButton.isHidden = true
+    }
       
     if !configuration.allowMultiplePhotoSelection {
       stackView.isHidden = true
