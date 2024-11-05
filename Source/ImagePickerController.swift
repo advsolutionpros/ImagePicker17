@@ -126,7 +126,7 @@ open class ImagePickerController: UIViewController {
     
    // for subview in [galleryView, bottomContainer] {
      //   print(subview.description)
-        addSubview(bottomContainer)
+     //   addSubview(bottomContainer)
    // }
 
     view.addSubview(volumeView)
