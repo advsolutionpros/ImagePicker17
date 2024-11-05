@@ -4,60 +4,73 @@ import UIKit
 
 extension BottomContainerView {
 
-  func setupConstraints() {
+    func setupConstraints() {
+        let screenSize = Helper.screenSizeForOrientation()
+        
+        // Center pickerButton and borderPickerButton
+        for attribute in [.centerX, .centerY] as [NSLayoutConstraint.Attribute] {
+            addConstraint(NSLayoutConstraint(item: pickerButton, attribute: attribute,
+                                             relatedBy: .equal, toItem: self, attribute: attribute,
+                                             multiplier: 1, constant: 0))
+            
+            addConstraint(NSLayoutConstraint(item: borderPickerButton, attribute: attribute,
+                                             relatedBy: .equal, toItem: self, attribute: attribute,
+                                             multiplier: 1, constant: 0))
+        }
 
-    for attribute: NSLayoutConstraint.Attribute in [.centerX, .centerY] {
-      addConstraint(NSLayoutConstraint(item: pickerButton, attribute: attribute,
-        relatedBy: .equal, toItem: self, attribute: attribute,
-        multiplier: 1, constant: 0))
+        // Set dimensions for pickerButton, borderPickerButton, and stackView
+        for attribute in [.width, .height] as [NSLayoutConstraint.Attribute] {
+            addConstraint(NSLayoutConstraint(item: pickerButton, attribute: attribute,
+                                             relatedBy: .equal, toItem: nil, attribute: .notAnAttribute,
+                                             multiplier: 1, constant: ButtonPicker.Dimensions.buttonSize))
+            
+            addConstraint(NSLayoutConstraint(item: borderPickerButton, attribute: attribute,
+                                             relatedBy: .equal, toItem: nil, attribute: .notAnAttribute,
+                                             multiplier: 1, constant: ButtonPicker.Dimensions.buttonBorderSize))
+            
+            addConstraint(NSLayoutConstraint(item: stackView, attribute: attribute,
+                                             relatedBy: .equal, toItem: nil, attribute: .notAnAttribute,
+                                             multiplier: 1, constant: ImageStackView.Dimensions.imageSize))
+        }
 
-      addConstraint(NSLayoutConstraint(item: borderPickerButton, attribute: attribute,
-        relatedBy: .equal, toItem: self, attribute: attribute,
-        multiplier: 1, constant: 0))
+        // Align topSeparator on the top, left, and full width of BottomContainerView
+        for attribute in [.width, .left, .top] as [NSLayoutConstraint.Attribute] {
+            addConstraint(NSLayoutConstraint(item: topSeparator, attribute: attribute,
+                                             relatedBy: .equal, toItem: self, attribute: attribute,
+                                             multiplier: 1, constant: 0))
+        }
+        
+        // Center doneButton vertically in the view
+        addConstraint(NSLayoutConstraint(item: doneButton, attribute: .centerY,
+                                         relatedBy: .equal, toItem: self, attribute: .centerY,
+                                         multiplier: 1, constant: 0))
+        
+        // Center stackView vertically in the view with a slight offset
+        addConstraint(NSLayoutConstraint(item: stackView, attribute: .centerY,
+                                         relatedBy: .equal, toItem: self, attribute: .centerY,
+                                         multiplier: 1, constant: -2))
+        
+        // Position doneButton on the right side, with a calculated horizontal offset
+        addConstraint(NSLayoutConstraint(item: doneButton, attribute: .centerX,
+                                         relatedBy: .equal, toItem: self, attribute: .right,
+                                         multiplier: 1, constant: -(screenSize.width - (ButtonPicker.Dimensions.buttonBorderSize + screenSize.width) / 2) / 2))
+
+        // Position stackView on the left side, with a calculated horizontal offset
+        addConstraint(NSLayoutConstraint(item: stackView, attribute: .centerX,
+                                         relatedBy: .equal, toItem: self, attribute: .left,
+                                         multiplier: 1, constant: screenSize.width / 4 - ButtonPicker.Dimensions.buttonBorderSize / 3))
+        
+        // Set the height of the topSeparator
+        addConstraint(NSLayoutConstraint(item: topSeparator, attribute: .height,
+                                         relatedBy: .equal, toItem: nil, attribute: .notAnAttribute,
+                                         multiplier: 1, constant: 1))
+
+        // Hide stackView and borderPickerButton if `cameraOnly` mode is active
+        if configuration.cameraOnly {
+            stackView.isHidden = true
+            borderPickerButton.isHidden = true
+        }
     }
-
-    for attribute: NSLayoutConstraint.Attribute in [.width, .left, .top] {
-      addConstraint(NSLayoutConstraint(item: topSeparator, attribute: attribute,
-        relatedBy: .equal, toItem: self, attribute: attribute,
-        multiplier: 1, constant: 0))
-    }
-
-    for attribute: NSLayoutConstraint.Attribute in [.width, .height] {
-      addConstraint(NSLayoutConstraint(item: pickerButton, attribute: attribute,
-        relatedBy: .equal, toItem: nil, attribute: .notAnAttribute,
-        multiplier: 1, constant: ButtonPicker.Dimensions.buttonSize))
-
-      addConstraint(NSLayoutConstraint(item: borderPickerButton, attribute: attribute,
-        relatedBy: .equal, toItem: nil, attribute: .notAnAttribute,
-        multiplier: 1, constant: ButtonPicker.Dimensions.buttonBorderSize))
-
-      addConstraint(NSLayoutConstraint(item: stackView, attribute: attribute,
-        relatedBy: .equal, toItem: nil, attribute: .notAnAttribute,
-        multiplier: 1, constant: ImageStackView.Dimensions.imageSize))
-    }
-
-    addConstraint(NSLayoutConstraint(item: doneButton, attribute: .centerY,
-      relatedBy: .equal, toItem: self, attribute: .centerY,
-      multiplier: 1, constant: 0))
-
-    addConstraint(NSLayoutConstraint(item: stackView, attribute: .centerY,
-      relatedBy: .equal, toItem: self, attribute: .centerY,
-      multiplier: 1, constant: -2))
-
-    let screenSize = Helper.screenSizeForOrientation()
-
-    addConstraint(NSLayoutConstraint(item: doneButton, attribute: .centerX,
-      relatedBy: .equal, toItem: self, attribute: .right,
-      multiplier: 1, constant: -(screenSize.width - (ButtonPicker.Dimensions.buttonBorderSize + screenSize.width)/2)/2))
-
-    addConstraint(NSLayoutConstraint(item: stackView, attribute: .centerX,
-      relatedBy: .equal, toItem: self, attribute: .left,
-      multiplier: 1, constant: screenSize.width/4 - ButtonPicker.Dimensions.buttonBorderSize/3))
-
-    addConstraint(NSLayoutConstraint(item: topSeparator, attribute: .height,
-      relatedBy: .equal, toItem: nil, attribute: .notAnAttribute,
-      multiplier: 1, constant: 1))
-  }
 }
 
 // MARK: - TopView autolayout
