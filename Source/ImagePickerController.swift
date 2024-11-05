@@ -136,11 +136,7 @@ open class ImagePickerController: UIViewController {
 
     subscribe()
     setupConstraints()
-      let action: () -> Void = { [weak self] in
-        guard let `self` = self else { return }
-        self.cameraController.takePicture { self.isTakingPicture = false }
-      }
-      collapseGalleryView(nil)
+    collapseGalleryView(nil)
   }
 
     open override func viewWillAppear(_ animated: Bool) {
@@ -177,7 +173,8 @@ open class ImagePickerController: UIViewController {
     initialContentOffset = galleryView.collectionView.contentOffset
 
     applyOrientationTransforms()
-
+      // Ensure the gallery view is collapsed after the layout is complete
+          collapseGalleryView(nil)
     UIAccessibility.post(notification: UIAccessibility.Notification.screenChanged, argument: bottomContainer)
   }
 
