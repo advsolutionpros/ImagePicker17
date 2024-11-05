@@ -136,6 +136,10 @@ open class ImagePickerController: UIViewController {
 
     subscribe()
     setupConstraints()
+      let action: () -> Void = { [weak self] in
+        guard let `self` = self else { return }
+        self.cameraController.takePicture { self.isTakingPicture = false }
+      }
       collapseGalleryView(nil)
   }
 
