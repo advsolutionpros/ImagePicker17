@@ -100,8 +100,94 @@ extension TopView {
 // MARK: - Controller autolayout
 
 extension ImagePickerController {
+    
+    func setupConstraints() {
+        let addConstraint: (UIView, NSLayoutConstraint.Attribute, Any, NSLayoutConstraint.Attribute, CGFloat) -> Void = { view1, attribute1, view2, attribute2, constant in
+            self.view.addConstraint(NSLayoutConstraint(item: view1, attribute: attribute1,
+                                                       relatedBy: .equal, toItem: view2, attribute: attribute2,
+                                                       multiplier: 1, constant: constant))
+        }
 
-  func setupConstraints() {
+        if configuration.cameraOnly {
+            // Only show camera view and top view
+            cameraController.view.translatesAutoresizingMaskIntoConstraints = false
+            topView.translatesAutoresizingMaskIntoConstraints = false
+
+            addConstraint(cameraController.view!, .leading, view, .leading, 0)
+            addConstraint(cameraController.view!, .trailing, view, .trailing, 0)
+            view.addConstraint(NSLayoutConstraint(item: cameraController.view!, attribute: .top,
+                                                  relatedBy: .equal, toItem: view.safeAreaLayoutGuide,
+                                                  attribute: .top, multiplier: 1, constant: 0))
+            addConstraint(cameraController.view!, .bottom, view, .bottom, 0)
+
+            addConstraint(topView, .leading, view, .leading, 0)
+            addConstraint(topView, .trailing, view, .trailing, 0)
+            view.addConstraint(NSLayoutConstraint(item: topView, attribute: .top,
+                                                  relatedBy: .equal, toItem: view.safeAreaLayoutGuide,
+                                                  attribute: .top, multiplier: 1, constant: 0))
+            view.addConstraint(NSLayoutConstraint(item: topView, attribute: .height,
+                                                  relatedBy: .equal, toItem: nil, attribute: .notAnAttribute,
+                                                  multiplier: 1, constant: TopView.Dimensions.height))
+
+        } else if configuration.galleryOnly {
+            // Only show gallery view
+            galleryView.translatesAutoresizingMaskIntoConstraints = false
+
+            addConstraint(galleryView, .leading, view, .leading, 0)
+            addConstraint(galleryView, .trailing, view, .trailing, 0)
+            view.addConstraint(NSLayoutConstraint(item: galleryView, attribute: .top,
+                                                  relatedBy: .equal, toItem: view.safeAreaLayoutGuide,
+                                                  attribute: .top, multiplier: 1, constant: 0))
+
+            var bottomPadding: CGFloat = 0
+            if let windowScene = UIApplication.shared.connectedScenes
+                .compactMap({ $0 as? UIWindowScene })
+                .first(where: { $0.activationState == .foregroundActive }),
+               let window = windowScene.windows.first(where: { $0.isKeyWindow }) {
+                bottomPadding = window.safeAreaInsets.bottom
+            }
+
+            view.addConstraint(NSLayoutConstraint(item: galleryView, attribute: .height,
+                                                  relatedBy: .equal, toItem: view, attribute: .height,
+                                                  multiplier: 1, constant: -(BottomContainerView.Dimensions.height + bottomPadding)))
+        } else {
+            // Default mode (Camera, Gallery, and Bottom Container)
+            cameraController.view.translatesAutoresizingMaskIntoConstraints = false
+            galleryView.translatesAutoresizingMaskIntoConstraints = false
+            topView.translatesAutoresizingMaskIntoConstraints = false
+            bottomContainer.translatesAutoresizingMaskIntoConstraints = false
+
+            // Camera constraints
+            addConstraint(cameraController.view!, .leading, view, .leading, 0)
+            addConstraint(cameraController.view!, .trailing, view, .trailing, 0)
+            view.addConstraint(NSLayoutConstraint(item: cameraController.view!, attribute: .top,
+                                                  relatedBy: .equal, toItem: view.safeAreaLayoutGuide,
+                                                  attribute: .top, multiplier: 1, constant: 0))
+            addConstraint(cameraController.view!, .bottom, bottomContainer, .top, 0)
+
+            // Gallery constraints
+            addConstraint(galleryView, .leading, view, .leading, 0)
+            addConstraint(galleryView, .trailing, view, .trailing, 0)
+            addConstraint(galleryView, .bottom, bottomContainer, .top, 0)
+            view.addConstraint(NSLayoutConstraint(item: galleryView, attribute: .height,
+                                                  relatedBy: .equal, toItem: nil,
+                                                  attribute: .notAnAttribute,
+                                                  multiplier: 1, constant: GestureConstants.minimumHeight))
+
+            // Bottom Container constraints
+            addConstraint(bottomContainer, .leading, view, .leading, 0)
+            addConstraint(bottomContainer, .trailing, view, .trailing, 0)
+            view.addConstraint(NSLayoutConstraint(item: bottomContainer, attribute: .bottom,
+                                                  relatedBy: .equal, toItem: view.safeAreaLayoutGuide,
+                                                  attribute: .bottom, multiplier: 1, constant: 0))
+            view.addConstraint(NSLayoutConstraint(item: bottomContainer, attribute: .height,
+                                                  relatedBy: .equal, toItem: nil,
+                                                  attribute: .notAnAttribute,
+                                                  multiplier: 1, constant: BottomContainerView.Dimensions.height))
+        }
+    }
+
+  func setupConstraintsOld() {
     let attributes: [NSLayoutConstraint.Attribute] = [.bottom, .right, .width]
     let topViewAttributes: [NSLayoutConstraint.Attribute] = [.left, .width]
 
