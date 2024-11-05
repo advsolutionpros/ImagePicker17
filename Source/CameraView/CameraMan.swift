@@ -177,7 +177,10 @@ class CameraMan {
                     // Handle the updated array of images
                     print(updatedImages)
                 }
-                
+                // Optionally call the completion handler
+                            DispatchQueue.main.async {
+                                completion?()
+                            }
                // self.savePhoto(image, location: location, completion: completion)
             }
         }
