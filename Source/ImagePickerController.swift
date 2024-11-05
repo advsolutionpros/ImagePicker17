@@ -120,12 +120,13 @@ open class ImagePickerController: UIViewController {
     
     if !configuration.galleryOnly {
       addSubview(cameraController.view)
-     // addSubview(topView)
+      addSubview(topView)
       cameraController.view.addGestureRecognizer(panGestureRecognizer)
     }
     
     for subview in [galleryView, bottomContainer] {
-      addSubview(subview)
+        print(subview.description)
+        addSubview(subview)
     }
 
     view.addSubview(volumeView)
