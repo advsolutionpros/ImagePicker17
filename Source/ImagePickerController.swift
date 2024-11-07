@@ -49,7 +49,6 @@ open class ImagePickerController: UIViewController {
     let controller = CameraView(configuration: self.configuration)
     controller.delegate = self
     controller.startOnFrontCamera = self.startOnFrontCamera
-
     return controller
     }()
 
@@ -223,8 +222,8 @@ open class ImagePickerController: UIViewController {
   }
 
   func permissionGranted() {
-    galleryView.fetchPhotos()
-    enableGestures(true)
+    //galleryView.fetchPhotos()
+    //enableGestures(true)
   }
 
   // MARK: - Notifications
