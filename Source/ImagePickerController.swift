@@ -80,6 +80,7 @@ open class ImagePickerController: UIViewController {
   var initialContentOffset: CGPoint?
   var numberOfCells: Int?
   var statusBarHidden = true
+open var capturedImages: [UIImage] = []
 
   fileprivate var isTakingPicture = false
   open var doneButtonTitle: String? {
@@ -364,14 +365,18 @@ open class ImagePickerController: UIViewController {
     bottomContainer.stackView.startLoader()
     let action: () -> Void = { [weak self] in
       guard let `self` = self else { return }
-      self.cameraController.takePicture { self.isTakingPicture = false }
+        self.cameraController.takePicture { [weak self] image in
+            guard let self = self, let image = image else { return }
+            self.isTakingPicture = false
+            self.capturedImages.append(image)  // Add the captured image to capturedImages array
+            }
     }
 
-    if configuration.collapseCollectionViewWhileShot {
+   // if configuration.collapseCollectionViewWhileShot {
       collapseGalleryView(action)
-    } else {
-      action()
-    }
+  //  } else {
+  //    action()
+ //   }
   }
 }
 

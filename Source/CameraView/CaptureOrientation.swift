@@ -10,7 +10,7 @@ import CoreMotion
 
 class CaptureOrientation {
 
-    private (set) var current = AVCaptureVideoOrientation.portrait
+    private(set) var current = AVCaptureVideoOrientation.portrait
 
     private let motionManager = CMMotionManager()
 

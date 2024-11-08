@@ -8,7 +8,7 @@ protocol CameraManDelegate: AnyObject {
     func cameraMan(_ cameraMan: CameraMan, didChangeInput input: AVCaptureDeviceInput)
 }
 
-class CameraMan {
+class CameraMan:NSObject {
     weak var delegate: CameraManDelegate?
     
     let session = AVCaptureSession()
@@ -16,12 +16,15 @@ class CameraMan {
     
     var backCamera: AVCaptureDeviceInput?
     var frontCamera: AVCaptureDeviceInput?
-    var stillImageOutput: AVCaptureStillImageOutput?
+    var stillImageOutput: AVCaptureStillImageOutput!
     var startOnFrontCamera: Bool = false
     let existingImages = [UIImage]()
     var updatedImages = [UIImage]()
     // Define an array to hold the captured images
     var capturedImages: [UIImage] = []
+    // Define a completion handler property
+    var photoCaptureCompletion: ((UIImage?) -> Void)?
+    var photoOutput = AVCapturePhotoOutput()
     
     private let captureOrientation = CaptureOrientation()
     deinit {
@@ -55,6 +58,7 @@ class CameraMan {
 
       // Output
       stillImageOutput = AVCaptureStillImageOutput()
+      //  let settings = AVCapturePhotoSettings()
         stillImageOutput?.outputSettings = [AVVideoCodecKey: AVVideoCodecType.jpeg]
     }
     
@@ -155,36 +159,54 @@ class CameraMan {
         }
     }
     
-    func takePhoto(_ previewLayer: AVCaptureVideoPreviewLayer, location: CLLocation?, completion: (() -> Void)? = nil) {
-        guard let connection = stillImageOutput?.connection(with: AVMediaType.video) else { return }
-        
-        connection.videoOrientation = captureOrientation.current
-        
-        queue.async {
-            self.stillImageOutput?.captureStillImageAsynchronously(from: connection) { buffer, error in
-                guard let buffer = buffer, error == nil && CMSampleBufferIsValid(buffer),
-                      let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(buffer),
-                      let image = UIImage(data: imageData)
-                else {
-                    DispatchQueue.main.async {
-                        completion?()
-                    }
-                    return
-                }
-                // Add the captured image to the array
-                self.capturedImages.append(image)
-                self.savePhotos(self.existingImages, newImage: image, location: nil) { updatedImages in
-                    // Handle the updated array of images
-                    print(updatedImages)
-                }
-                // Optionally call the completion handler
-                            DispatchQueue.main.async {
-                                completion?()
-                            }
-               // self.savePhoto(image, location: location, completion: completion)
-            }
+    func takePhoto(_ previewLayer: AVCaptureVideoPreviewLayer, location: CLLocation?, completion: @escaping (UIImage?) -> Void) {
+        // Directly use `photoOutput` since it’s not optional
+        let connection = photoOutput.connection(with: .video)
+        guard let connection = connection else {
+            completion(nil)
+            return
         }
+
+        connection.videoOrientation = previewLayer.connection?.videoOrientation ?? .portrait
+
+        let photoSettings = AVCapturePhotoSettings()
+        photoSettings.flashMode = .auto // Adjust flash settings if needed
+
+        photoOutput.capturePhoto(with: photoSettings, delegate: self)
+
+        // Store the completion handler to be called in the delegate method
+        self.photoCaptureCompletion = completion
     }
+    
+//    func takePhoto(_ previewLayer: AVCaptureVideoPreviewLayer, location: CLLocation?, completion: (() -> Void)? = nil) {
+//        guard let connection = stillImageOutput?.connection(with: AVMediaType.video) else { return }
+//        connection.videoOrientation = captureOrientation.current
+//        
+//        queue.async {
+//            self.stillImageOutput?.captureStillImageAsynchronously(from: connection) { buffer, error in
+//                guard let buffer = buffer, error == nil && CMSampleBufferIsValid(buffer),
+//                      let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(buffer),
+//                      let image = UIImage(data: imageData)
+//                else {
+//                    DispatchQueue.main.async {
+//                        completion?()
+//                    }
+//                    return
+//                }
+//                // Add the captured image to the array
+//                self.capturedImages.append(image)
+//               // self.savePhotos(self.existingImages, newImage: image, location: nil) { updatedImages in
+//                    // Handle the updated array of images
+//               //     print(updatedImages)
+//               // }
+//                // Optionally call the completion handler
+//                            DispatchQueue.main.async {
+//                                completion?()
+//                            }
+//               // self.savePhoto(image, location: location, completion: completion)
+//            }
+//        }
+//    }
     
     func savePhotos(_ imagesArray: [UIImage], newImage: UIImage, location: CLLocation?, completion: @escaping ([UIImage]) -> Void) {
         // Process the images or perform any other necessary operations
@@ -273,5 +295,20 @@ class CameraMan {
             AVCaptureSession.Preset.high.rawValue,
             AVCaptureSession.Preset.low.rawValue
         ]
+    }
+}
+// Conform to AVCapturePhotoCaptureDelegate
+extension CameraMan: AVCapturePhotoCaptureDelegate {
+    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+        guard error == nil, let imageData = photo.fileDataRepresentation(), let image = UIImage(data: imageData) else {
+            // Call the completion with nil if there’s an error
+            photoCaptureCompletion?(nil)
+            photoCaptureCompletion = nil
+            return
+        }
+
+        // Call the completion with the captured image
+        photoCaptureCompletion?(image)
+        photoCaptureCompletion = nil
     }
 }
