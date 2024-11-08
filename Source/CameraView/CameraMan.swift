@@ -300,15 +300,29 @@ class CameraMan:NSObject {
 // Conform to AVCapturePhotoCaptureDelegate
 extension CameraMan: AVCapturePhotoCaptureDelegate {
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
-        guard error == nil, let imageData = photo.fileDataRepresentation(), let image = UIImage(data: imageData) else {
-            // Call the completion with nil if there’s an error
-            photoCaptureCompletion?(nil)
-            photoCaptureCompletion = nil
-            return
-        }
+        if let error = error {
+                    print("Error capturing photo: \(error.localizedDescription)")
+                    photoCaptureCompletion?(nil)
+                    photoCaptureCompletion = nil
+                    return
+                }
 
-        // Call the completion with the captured image
-        photoCaptureCompletion?(image)
-        photoCaptureCompletion = nil
+        guard let imageData = photo.fileDataRepresentation() else {
+                    print("Error: No image data representation available.")
+                    photoCaptureCompletion?(nil)
+                    photoCaptureCompletion = nil
+                    return
+                }
+                
+                if let image = UIImage(data: imageData) {
+                    print("Captured image: \(image)")
+                    photoCaptureCompletion?(image)
+                } else {
+                    print("Error: Could not convert image data to UIImage.")
+                    photoCaptureCompletion?(nil)
+                }
+                
+                // Reset completion to avoid retaining it
+                photoCaptureCompletion = nil
     }
 }
