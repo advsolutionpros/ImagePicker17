@@ -16,15 +16,16 @@ class CameraMan:NSObject {
     
     var backCamera: AVCaptureDeviceInput?
     var frontCamera: AVCaptureDeviceInput?
-    var stillImageOutput: AVCaptureStillImageOutput!
+   // var stillImageOutput: AVCaptureStillImageOutput!
     var startOnFrontCamera: Bool = false
-    let existingImages = [UIImage]()
-    var updatedImages = [UIImage]()
+   // let existingImages = [UIImage]()
+   // var updatedImages = [UIImage]()
+    // Define an array to hold the captured images
+    var photoOutput = AVCapturePhotoOutput()
     // Define an array to hold the captured images
     var capturedImages: [UIImage] = []
     // Define a completion handler property
     var photoCaptureCompletion: ((UIImage?) -> Void)?
-    var photoOutput = AVCapturePhotoOutput()
     
     private let captureOrientation = CaptureOrientation()
     deinit {
@@ -40,27 +41,27 @@ class CameraMan:NSObject {
     }
     
     func setupDevices() {
-      // Input
-      AVCaptureDevice
-      .devices()
-      .filter {
-        return $0.hasMediaType(AVMediaType.video)
-      }.forEach {
-        switch $0.position {
-        case .front:
-          self.frontCamera = try? AVCaptureDeviceInput(device: $0)
-        case .back:
-          self.backCamera = try? AVCaptureDeviceInput(device: $0)
-        default:
-          break
+            // Input
+            AVCaptureDevice
+                .devices(for: .video)
+                .forEach {
+                    switch $0.position {
+                    case .front:
+                        self.frontCamera = try? AVCaptureDeviceInput(device: $0)
+                    case .back:
+                        self.backCamera = try? AVCaptureDeviceInput(device: $0)
+                    default:
+                        break
+                    }
+                }
+            
+            // Add photoOutput to session if possible
+            if session.canAddOutput(photoOutput) {
+                session.addOutput(photoOutput)
+            } else {
+                print("Failed to add photo output")
+            }
         }
-      }
-
-      // Output
-      stillImageOutput = AVCaptureStillImageOutput()
-      //  let settings = AVCapturePhotoSettings()
-        stillImageOutput?.outputSettings = [AVVideoCodecKey: AVVideoCodecType.jpeg]
-    }
     
     func addInput(_ input: AVCaptureDeviceInput) {
         configurePreset(input)
@@ -111,21 +112,21 @@ class CameraMan:NSObject {
         // Devices
         setupDevices()
         print("\(Date()) \("💙") \(self).\(#function):\(#line)-CameraMan start")
-        guard let input = (self.startOnFrontCamera) ? frontCamera ?? backCamera : backCamera, let output = stillImageOutput else { return }
+        guard let input = (self.startOnFrontCamera) ? frontCamera ?? backCamera : backCamera else { return }
         
         addInput(input)
         
-        if session.canAddOutput(output) {
-            session.addOutput(output)
-        }
+       // if session.canAddOutput(output) {
+        //    session.addOutput(output)
+       // }
         
         queue.async {
-            self.session.startRunning()
-            
-            DispatchQueue.main.async {
-                self.delegate?.cameraManDidStart(self)
-            }
-        }
+                    self.session.startRunning()
+                    
+                    DispatchQueue.main.async {
+                        self.delegate?.cameraManDidStart(self)
+                    }
+                }
     }
     
     func stop() {
@@ -161,11 +162,10 @@ class CameraMan:NSObject {
     
     func takePhoto(_ previewLayer: AVCaptureVideoPreviewLayer, location: CLLocation?, completion: @escaping (UIImage?) -> Void) {
         // Directly use `photoOutput` since it’s not optional
-        let connection = photoOutput.connection(with: .video)
-        guard let connection = connection else {
-            completion(nil)
-            return
-        }
+        guard let connection = photoOutput.connection(with: .video) else {
+                    completion(nil)
+                    return
+                }
 
         connection.videoOrientation = previewLayer.connection?.videoOrientation ?? .portrait
 
@@ -175,8 +175,7 @@ class CameraMan:NSObject {
         photoOutput.capturePhoto(with: photoSettings, delegate: self)
 
         // Assign the completion handler to be called in the delegate
-            self.photoCaptureCompletion = completion
-            photoOutput.capturePhoto(with: photoSettings, delegate: self)
+        self.photoCaptureCompletion = completion
     }
     
 //    func takePhoto(_ previewLayer: AVCaptureVideoPreviewLayer, location: CLLocation?, completion: (() -> Void)? = nil) {
