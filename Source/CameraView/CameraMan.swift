@@ -174,8 +174,9 @@ class CameraMan:NSObject {
 
         photoOutput.capturePhoto(with: photoSettings, delegate: self)
 
-        // Store the completion handler to be called in the delegate method
-        self.photoCaptureCompletion = completion
+        // Assign the completion handler to be called in the delegate
+            self.photoCaptureCompletion = completion
+            photoOutput.capturePhoto(with: photoSettings, delegate: self)
     }
     
 //    func takePhoto(_ previewLayer: AVCaptureVideoPreviewLayer, location: CLLocation?, completion: (() -> Void)? = nil) {
